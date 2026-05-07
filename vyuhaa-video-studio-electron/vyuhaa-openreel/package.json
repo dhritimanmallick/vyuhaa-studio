@@ -1,0 +1,75 @@
+{
+  "name": "vyuhaa-video-studio",
+  "version": "1.0.0",
+  "description": "Vyuhaa Video Studio - Professional video editor for medical researchers and medtech teams",
+  "author": "Vyuhaa Med Data Private Limited <contact@vyuhaadata.com>",
+  "homepage": "https://www.vyuhaadata.com",
+  "license": "MIT",
+  "main": "electron/main.js",
+  "scripts": {
+    "install:app": "pnpm install",
+    "build:web": "pnpm --filter @openreel/web build",
+    "build:electron": "electron-builder --win --publish never",
+    "build:all": "pnpm install && pnpm build:web && pnpm build:electron",
+    "dev": "concurrently \"pnpm --filter @openreel/web dev\" \"wait-on http://localhost:5173 && electron .\""
+  },
+  "build": {
+    "appId": "com.vyuhaadata.videostudio",
+    "productName": "Vyuhaa Video Studio",
+    "copyright": "Copyright © 2026 Vyuhaa Med Data Private Limited",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "build/icon.*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "publisherName": "Vyuhaa Med Data Private Limited",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Vyuhaa Video Studio",
+      "include": "build/installer.nsh"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.png",
+      "category": "public.app-category.video"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png",
+      "category": "Video"
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^25.0.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.2.0"
+  }
+}
