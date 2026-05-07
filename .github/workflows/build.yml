@@ -3,13 +3,16 @@ name: Build Vyuhaa Video Studio
 on:
   push:
     tags:
-      - 'v*'          # Trigger on version tags e.g. v1.0.0
-  workflow_dispatch:   # Allow manual trigger from GitHub UI
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-windows:
     runs-on: windows-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,40 +28,29 @@ jobs:
           version: 9
           run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Install OpenReel dependencies
+        working-directory: openreel-video-main
+        run: pnpm install
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build web app
+      - name: Build OpenReel web app
+        working-directory: openreel-video-main
         run: pnpm --filter @openreel/web build
         env:
           NODE_ENV: production
 
-      - name: Copy web build to Electron wrapper
-        shell: bash
-        run: |
-          mkdir -p dist
-          cp -r apps/web/dist/* dist/
+      - name: Install Electron wrapper dependencies
+        working-directory: electron-wrapper
+        run: pnpm install
 
-      - name: Install Electron dependencies
+      - name: Copy web build into Electron wrapper
+        shell: pwsh
         run: |
-          cd electron-wrapper
-          pnpm install
+          New-Item -ItemType Directory -Force -Path "electron-wrapper\dist"
+          Copy-Item -Path "openreel-video-main\apps\web\dist\*" -Destination "electron-wrapper\dist\" -Recurse -Force
 
       - name: Build Windows installer
-        run: |
-          cd electron-wrapper
-          pnpm build:electron
+        working-directory: electron-wrapper
+        run: pnpm build:electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,21 +69,14 @@ jobs:
           name: Vyuhaa Video Studio ${{ github.ref_name }}
           body: |
             ## Vyuhaa Video Studio ${{ github.ref_name }}
-            
+
             Professional video editor for medical researchers and medtech teams.
-            
-            ### Features
-            - Multi-track timeline video editing
-            - Auto-captions and subtitle tools
-            - Color grading and video effects
-            - GPU-accelerated export
-            - 100% offline — your files never leave your computer
-            
+
             ### Installation
             1. Download `VyuhaaVideoStudio-Setup.exe` below
             2. Run the installer
             3. Launch from Desktop or Start Menu
-            
+
             Built on OpenReel · Powered by Vyuhaa Med Data · www.vyuhaadata.com
           draft: false
           prerelease: false
