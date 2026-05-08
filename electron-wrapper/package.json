@@ -6,6 +6,10 @@
   "homepage": "https://www.vyuhaadata.com",
   "license": "MIT",
   "main": "electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhritimanmallick/vyuhaa-studio.git"
+  },
   "scripts": {
     "build:electron": "electron-builder --win --publish never"
   },
@@ -13,6 +17,7 @@
     "appId": "com.vyuhaadata.videostudio",
     "productName": "Vyuhaa Video Studio",
     "copyright": "Copyright © 2026 Vyuhaa Med Data Private Limited",
+    "publish": null,
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -31,7 +36,9 @@
         }
       ],
       "icon": "build/icon.ico",
-      "publisherName": "Vyuhaa Med Data Private Limited"
+      "signtoolOptions": {
+        "publisherName": "Vyuhaa Med Data Private Limited"
+      }
     },
     "nsis": {
       "oneClick": false,
