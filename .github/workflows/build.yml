@@ -47,12 +47,27 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "electron-wrapper\dist"
           Copy-Item -Path "openreel-video-main\apps\web\dist\*" -Destination "electron-wrapper\dist\" -Recurse -Force
+          Write-Host "Contents of electron-wrapper\dist:"
+          Get-ChildItem "electron-wrapper\dist"
+
+      - name: Verify dist exists
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "electron-wrapper\dist\index.html")) {
+            Write-Error "dist/index.html not found - web build may have failed"
+            exit 1
+          }
+          Write-Host "dist/index.html found OK"
 
       - name: Build Windows installer
         working-directory: electron-wrapper
         run: pnpm build:electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List release folder
+        shell: pwsh
+        run: Get-ChildItem "electron-wrapper\release" -Recurse
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
@@ -69,16 +84,7 @@ jobs:
           name: Vyuhaa Video Studio ${{ github.ref_name }}
           body: |
             ## Vyuhaa Video Studio ${{ github.ref_name }}
-
             Professional video editor for medical researchers and medtech teams.
-
-            ### Installation
-            1. Download `VyuhaaVideoStudio-Setup.exe` below
-            2. Run the installer
-            3. Launch from Desktop or Start Menu
-
             Built on OpenReel · Powered by Vyuhaa Med Data · www.vyuhaadata.com
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
