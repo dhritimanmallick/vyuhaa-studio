@@ -7,11 +7,7 @@
   "license": "MIT",
   "main": "electron/main.js",
   "scripts": {
-    "install:app": "pnpm install",
-    "build:web": "pnpm --filter @openreel/web build",
-    "build:electron": "electron-builder --win --publish never",
-    "build:all": "pnpm install && pnpm build:web && pnpm build:electron",
-    "dev": "concurrently \"pnpm --filter @openreel/web dev\" \"wait-on http://localhost:5173 && electron .\""
+    "build:electron": "electron-builder --win --publish never"
   },
   "build": {
     "appId": "com.vyuhaadata.videostudio",
@@ -27,12 +23,6 @@
       "build/icon.*",
       "package.json"
     ],
-    "extraResources": [
-      {
-        "from": "dist",
-        "to": "dist"
-      }
-    ],
     "win": {
       "target": [
         {
@@ -41,8 +31,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "publisherName": "Vyuhaa Med Data Private Limited",
-      "verifyUpdateCodeSignature": false
+      "publisherName": "Vyuhaa Med Data Private Limited"
     },
     "nsis": {
       "oneClick": false,
@@ -53,7 +42,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Vyuhaa Video Studio",
-      "include": "build/installer.nsh"
+      "welcomeTitle": "Welcome to Vyuhaa Video Studio",
+      "runAfterFinish": true
     },
     "mac": {
       "target": "dmg",
@@ -68,8 +58,6 @@
   },
   "devDependencies": {
     "electron": "^31.0.0",
-    "electron-builder": "^25.0.0",
-    "concurrently": "^8.2.0",
-    "wait-on": "^7.2.0"
+    "electron-builder": "^25.0.0"
   }
 }
