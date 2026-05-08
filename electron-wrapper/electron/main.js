@@ -1,9 +1,17 @@
-const { app, BrowserWindow, shell, Menu, dialog } = require('electron');
+const { app, BrowserWindow, shell, Menu, dialog, protocol } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
 let mainWindow;
+
+function getDistPath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'dist');
+  }
+  return path.join(__dirname, '..', 'dist');
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -11,12 +19,13 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 600,
-    icon: path.join(__dirname, '../build/icon.ico'),
+    icon: path.join(__dirname, '..', 'build', 'icon.ico'),
     title: 'Vyuhaa Video Studio',
     backgroundColor: '#0f172a',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false, // Allow loading local files
     },
     show: false,
   });
@@ -32,22 +41,14 @@ function createWindow() {
     });
   });
 
-  // Resolve correct path whether running in dev or packaged
-  let indexPath;
-  if (app.isPackaged) {
-    // When packaged, resources are in process.resourcesPath
-    indexPath = path.join(process.resourcesPath, 'dist', 'index.html');
-  } else {
-    indexPath = path.join(__dirname, '..', 'dist', 'index.html');
-  }
+  const distPath = getDistPath();
+  const indexPath = path.join(distPath, 'index.html');
 
-  console.log('Loading:', indexPath);
-  mainWindow.loadFile(indexPath).catch(err => {
-    console.error('Failed to load:', err);
-    // Fallback - try alternate path
-    const fallback = path.join(__dirname, '..', 'dist', 'index.html');
-    mainWindow.loadFile(fallback);
-  });
+  console.log('distPath:', distPath);
+  console.log('indexPath:', indexPath);
+  console.log('exists:', fs.existsSync(indexPath));
+
+  mainWindow.loadFile(indexPath);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -67,8 +68,6 @@ function createMenu() {
     {
       label: 'File',
       submenu: [
-        { label: 'New Project', accelerator: 'CmdOrCtrl+N', click: () => mainWindow?.webContents.send('new-project') },
-        { type: 'separator' },
         { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: () => app.quit() },
       ],
     },
