@@ -24,9 +24,15 @@
     },
     "files": [
       "electron/**/*",
-      "dist/**/*",
       "build/icon.*",
       "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist",
+        "filter": ["**/*"]
+      }
     ],
     "win": {
       "target": [
