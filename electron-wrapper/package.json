@@ -42,18 +42,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Vyuhaa Video Studio",
-      "welcomeTitle": "Welcome to Vyuhaa Video Studio",
       "runAfterFinish": true
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "build/icon.png",
-      "category": "public.app-category.video"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "build/icon.png",
-      "category": "Video"
     }
   },
   "devDependencies": {
